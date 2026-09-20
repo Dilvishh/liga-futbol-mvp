@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Veedor - Partidos de la Fecha</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-[#121620] text-slate-100 min-h-screen font-sans pb-20">
+
+    <!-- Top Bar -->
+    <header class="bg-[#1a202c] border-b border-slate-800 p-4 sticky top-0 z-50 flex items-center justify-between">
+        <h1 class="text-sm font-bold text-amber-400 uppercase tracking-wide">🏆 Copa Libertadores 2026</h1>
+        <a href="/" class="text-xs text-slate-400 hover:text-white border border-slate-700 px-2 py-1 rounded">Tabla</a>
+    </header>
+
+    <main class="max-w-md mx-auto px-3 mt-4 space-y-3">
+        <div class="text-xs font-semibold text-slate-400 px-1 uppercase tracking-wider">Fecha 1 — Grupo A</div>
+
+        {% for p in partidos %}
+        <!-- Tarjeta de partido clicable que lleva al centro de partido -->
+        <a href="/partido/{{ p.id }}" class="block bg-[#1a2130] border border-slate-800 hover:border-slate-600 rounded-xl p-3.5 transition shadow-sm">
+            <div class="flex items-center justify-between text-[11px] text-slate-400 mb-2">
+                <span>Partido #{{ p.id }}</span>
+                <span class="px-2 py-0.5 rounded font-bold {% if p.estado == 'FINALIZADO' %}bg-slate-800 text-slate-300{% else %}bg-emerald-500/20 text-emerald-400{% endif %}">
+                    {{ p.estado }}
+                </span>
+            </div>
+            
+            <div class="grid grid-cols-5 items-center gap-2">
+                <div class="col-span-2 flex items-center justify-end gap-2 text-right">
+                    <span class="font-bold text-sm text-slate-200 truncate">{{ p.local.nombre }}</span>
+                    <div class="w-7 h-7 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-xs">🛡️</div>
+                </div>
+                
+                <div class="flex items-center justify-center">
+                    <span class="bg-[#0f131a] px-3 py-1 rounded-lg font-black text-amber-400 text-base tracking-wider border border-slate-800">
+                        {{ p.goles_local }} - {{ p.goles_visita }}
+                    </span>
+                </div>
+
+                <div class="col-span-2 flex items-center justify-start gap-2 text-left">
+                    <div class="w-7 h-7 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-xs">🛡️</div>
+                    <span class="font-bold text-sm text-slate-200 truncate">{{ p.visita.nombre }}</span>
+                </div>
+            </div>
+        </a>
+        {% endfor %}
+    </main>
+
+    <!-- Barra inferior tipo app nativa -->
+    <nav class="fixed bottom-0 left-0 right-0 bg-[#161b26] border-t border-slate-800 p-2 flex justify-around text-xs">
+        <a href="/veedor" class="flex flex-col items-center text-amber-400 font-bold">
+            <span>📋</span><span>Veedor</span>
+        </a>
+        <a href="/" class="flex flex-col items-center text-slate-400">
+            <span>📊</span><span>Posiciones</span>
+        </a>
+        <a href="/admin" class="flex flex-col items-center text-slate-400">
+            <span>⚙️</span><span>Admin</span>
+        </a>
+    </nav>
+</body>
+</html>

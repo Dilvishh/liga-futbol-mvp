@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ partido.local.nombre }} vs {{ partido.visita.nombre }}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-[#0d1117] text-slate-100 min-h-screen font-sans pb-24">
+
+    <!-- Top Bar con Volver -->
+    <header class="bg-[#161b22] border-b border-slate-800 px-4 py-3 flex items-center justify-between sticky top-0 z-40">
+        <a href="/veedor" class="text-amber-400 text-sm font-semibold flex items-center gap-1">
+            ← Volver
+        </a>
+        <div class="text-xs font-bold text-slate-300 uppercase truncate max-w-[200px]">
+            {{ partido.local.nombre }} vs {{ partido.visita.nombre }}
+        </div>
+        <span class="text-xs bg-slate-800 text-slate-300 px-2 py-0.5 rounded font-semibold">{{ partido.estado }}</span>
+    </header>
+
+    <main class="max-w-md mx-auto px-3 mt-3 space-y-4">
+
+        <!-- BANNER PRINCIPAL (ESTILO CANCHA) -->
+        <div class="relative bg-gradient-to-b from-emerald-900/60 to-slate-900 border border-emerald-800/40 rounded-2xl p-5 shadow-lg overflow-hidden">
+            <div class="text-center text-[11px] text-slate-400 mb-2">Cancha 1 • Complejo Principal</div>
+            
+            <div class="grid grid-cols-5 items-center">
+                <div class="col-span-2 text-center">
+                    <div class="w-12 h-12 mx-auto rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-xl mb-1 shadow">🛡️</div>
+                    <p class="font-bold text-sm text-slate-100 truncate">{{ partido.local.nombre }}</p>
+                </div>
+
+                <div class="text-center">
+                    <div class="text-3xl font-black text-amber-400 tracking-wider">
+                        {{ partido.goles_local }} : {{ partido.goles_visita }}
+                    </div>
+                    <span class="text-[10px] text-slate-400 uppercase font-semibold">Min 40'</span>
+                </div>
+
+                <div class="col-span-2 text-center">
+                    <div class="w-12 h-12 mx-auto rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-xl mb-1 shadow">🛡️</div>
+                    <p class="font-bold text-sm text-slate-100 truncate">{{ partido.visita.nombre }}</p>
+                </div>
+            </div>
+
+            <!-- Racha reciente (G, E, P del video) -->
+            <div class="flex items-center justify-center gap-1 mt-4 text-[10px] font-bold">
+                <span class="w-4 h-4 rounded-full bg-emerald-500 text-slate-950 flex items-center justify-center">G</span>
+                <span class="w-4 h-4 rounded-full bg-emerald-500 text-slate-950 flex items-center justify-center">G</span>
+                <span class="w-4 h-4 rounded-full bg-amber-500 text-slate-950 flex items-center justify-center">E</span>
+                <span class="mx-2 text-slate-500">-</span>
+                <span class="w-4 h-4 rounded-full bg-rose-500 text-white flex items-center justify-center">P</span>
+                <span class="w-4 h-4 rounded-full bg-rose-500 text-white flex items-center justify-center">P</span>
+            </div>
+        </div>
+
+        <!-- BITÁCORA DE INCIDENCIAS -->
+        <section class="bg-[#161b22] border border-slate-800 rounded-xl p-4">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3 flex items-center gap-2">
+                ⚡ Incidencias del Partido
+            </h3>
+
+            {% if not incidencias %}
+            <p class="text-xs text-slate-500 italic text-center py-4">No hay incidencias registradas aún</p>
+            {% else %}
+            <div class="space-y-2">
+                {% for inc in incidencias %}
+                <div class="flex items-center justify-between bg-slate-900/80 border border-slate-800/80 px-3 py-2 rounded-lg text-xs">
+                    <div class="flex items-center gap-2">
+                        <span>
+                            {% if inc.tipo == 'GOL' %}⚽
+                            {% elif inc.tipo == 'AMARILLA' %}🟨
+                            {% elif inc.tipo == 'ROJA' %}🟥
+                            {% else %}⭐{% endif %}
+                        </span>
+                        <span class="font-semibold text-slate-200">{{ inc.detalle }}</span>
+                        {% if inc.minuto %}<span class="text-slate-500">({{ inc.minuto }}')</span>{% endif %}
+                    </div>
+                    <form action="/partido/{{ partido.id }}/incidencia/{{ inc.id }}/eliminar" method="POST">
+                        <button type="submit" class="bg-rose-500/20 text-rose-400 hover:bg-rose-500 hover:text-white px-2 py-0.5 rounded text-[10px] font-bold transition">
+                            Eliminar
+                        </button>
+                    </form>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </section>
+
+        <!-- FORMULARIO RÁPIDO DE INCIDENCIA (SIMULA EL MODAL DEL VIDEO) -->
+        <section class="bg-[#161b22] border border-slate-800 rounded-xl p-4">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-amber-400 mb-3">
+                ➕ Cargar Evento Rápido
+            </h3>
+            <form action="/partido/{{ partido.id }}/incidencia" method="POST" class="space-y-3 text-xs">
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="text-slate-400">Tipo de Incidencia</label>
+                        <select name="tipo" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-white mt-1">
+                            <option value="GOL">⚽ Gol</option>
+                            <option value="AMARILLA">🟨 Tarjeta Amarilla</option>
+                            <option value="ROJA">🟥 Tarjeta Roja</option>
+                            <option value="MVP">⭐ MVP del Partido</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-slate-400">Equipo</label>
+                        <select name="equipo_tipo" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-white mt-1">
+                            <option value="local">{{ partido.local.nombre }}</option>
+                            <option value="visita">{{ partido.visita.nombre }}</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-3 gap-2">
+                    <div class="col-span-2">
+                        <label class="text-slate-400">Jugador</label>
+                        <input type="text" name="jugador_nombre" placeholder="Nombre o número" required
+                            class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-white mt-1">
+                    </div>
+                    <div>
+                        <label class="text-slate-400">Minuto</label>
+                        <input type="number" name="minuto" value="15"
+                            class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-white mt-1">
+                    </div>
+                </div>
+
+                <button type="submit" class="w-full bg-amber-400 hover:bg-amber-500 text-slate-950 font-bold py-2 rounded-lg transition">
+                    Guardar Incidencia
+                </button>
+            </form>
+        </section>
+
+    </main>
+</body>
+</html>
