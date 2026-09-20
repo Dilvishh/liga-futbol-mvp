@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liga de Estrellas Doradas</title>
+    <!-- Tailwind CSS para diseño moderno inmediato -->
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen font-sans pb-12">
+
+    <!-- Cabecera -->
+    <header class="bg-slate-800 border-b border-slate-700 p-4 shadow-lg sticky top-0 z-50">
+        <div class="max-w-4xl mx-auto flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <span class="text-2xl">🏆</span>
+                <div>
+                    <h1 class="text-lg font-bold text-amber-400 leading-tight">Liga de Estrellas Doradas</h1>
+                    <p class="text-xs text-slate-400">Torneo Clausura 2026</p>
+                </div>
+            </div>
+            <span class="bg-amber-400/10 text-amber-400 text-xs px-2.5 py-1 rounded-full font-semibold border border-amber-400/20">
+                MVP v1.0
+            </span>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto px-4 mt-6 space-y-8">
+
+        <!-- SECCIÓN: TABLA DE POSICIONES -->
+        <section class="bg-slate-800 rounded-xl p-5 border border-slate-700 shadow-md">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-lg font-bold text-white flex items-center gap-2">
+                    📊 Tabla de Posiciones
+                </h2>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse text-sm">
+                    <thead>
+                        <tr class="text-xs uppercase text-slate-400 border-b border-slate-700">
+                            <th class="py-3 px-2 text-center">#</th>
+                            <th class="py-3 px-2">Equipo</th>
+                            <th class="py-3 px-2 text-center font-semibold">PTS</th>
+                            <th class="py-3 px-2 text-center">PJ</th>
+                            <th class="py-3 px-2 text-center">PG</th>
+                            <th class="py-3 px-2 text-center">PE</th>
+                            <th class="py-3 px-2 text-center">PP</th>
+                            <th class="py-3 px-2 text-center">GF</th>
+                            <th class="py-3 px-2 text-center">GC</th>
+                            <th class="py-3 px-2 text-center font-semibold">DG</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-700/50">
+                        {% for fila in tabla %}
+                        <tr class="hover:bg-slate-700/30 transition">
+                            <td class="py-3 px-2 text-center font-bold text-slate-400">{{ loop.index }}</td>
+                            <td class="py-3 px-2 font-semibold text-white flex items-center gap-2">
+                                <span class="w-2 h-2 rounded-full {% if loop.index == 1 %}bg-amber-400{% else %}bg-slate-500{% endif %}"></span>
+                                {{ fila.equipo }}
+                            </td>
+                            <td class="py-3 px-2 text-center font-bold text-amber-400 bg-slate-700/20 rounded">{{ fila.pts }}</td>
+                            <td class="py-3 px-2 text-center text-slate-300">{{ fila.pj }}</td>
+                            <td class="py-3 px-2 text-center text-slate-300">{{ fila.pg }}</td>
+                            <td class="py-3 px-2 text-center text-slate-300">{{ fila.pe }}</td>
+                            <td class="py-3 px-2 text-center text-slate-300">{{ fila.pp }}</td>
+                            <td class="py-3 px-2 text-center text-slate-300">{{ fila.gf }}</td>
+                            <td class="py-3 px-2 text-center text-slate-300">{{ fila.gc }}</td>
+                            <td class="py-3 px-2 text-center font-medium {% if fila.dg > 0 %}text-emerald-400{% elif fila.dg < 0 %}text-rose-400{% else %}text-slate-400{% endif %}">
+                                {{ "%+d"|format(fila.dg) }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- SECCIÓN: PARTIDOS Y RESULTADOS -->
+        <section class="bg-slate-800 rounded-xl p-5 border border-slate-700 shadow-md">
+            <h2 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                ⚽ Partidos y Resultados
+            </h2>
+
+            <div class="grid gap-3 sm:grid-cols-2">
+                {% for p in partidos %}
+                <div class="bg-slate-900/80 border border-slate-700/80 rounded-lg p-3.5 flex flex-col justify-between">
+                    <div class="flex items-center justify-between text-xs text-slate-400 mb-2">
+                        <span>Partido #{{ p.id }}</span>
+                        <span class="px-2 py-0.5 rounded font-medium {% if p.estado == 'FINALIZADO' %}bg-slate-700 text-slate-300{% elif p.estado == 'EN_VIVO' %}bg-rose-500/20 text-rose-400 border border-rose-500/30{% else %}bg-blue-500/20 text-blue-400{% endif %}">
+                            {{ p.estado }}
+                        </span>
+                    </div>
+                    <div class="flex items-center justify-between my-1">
+                        <span class="font-semibold text-slate-200 text-sm w-5/12 truncate text-right">{{ p.local.nombre }}</span>
+                        <span class="px-3 py-1 bg-slate-800 border border-slate-700 text-amber-400 font-bold rounded text-sm mx-2">
+                            {{ p.goles_local }} - {{ p.goles_visita }}
+                        </span>
+                        <span class="font-semibold text-slate-200 text-sm w-5/12 truncate text-left">{{ p.visita.nombre }}</span>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+
+        <!-- SECCIÓN: EQUIPOS Y PLANTELES -->
+        <section class="bg-slate-800 rounded-xl p-5 border border-slate-700 shadow-md">
+            <h2 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                🛡️ Equipos Registrados
+            </h2>
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                {% for eq in equipos %}
+                <div class="bg-slate-900/60 border border-slate-700/60 p-3 rounded-lg">
+                    <p class="font-bold text-sm text-slate-200">{{ eq.nombre }}</p>
+                    <p class="text-xs text-slate-400 mt-1">{{ eq.jugadores|length }} jugadores inscritos</p>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+
+    </main>
+</body>
+</html>
