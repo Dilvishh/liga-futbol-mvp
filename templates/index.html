@@ -3,89 +3,71 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Liga de Estrellas Doradas - Web Oficial</title>
+    <title>Liga de Estrellas Doradas</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-[#0b0e14] text-slate-100 min-h-screen font-sans pb-16">
+<body class="bg-[#0b0e14] text-slate-100 min-h-screen font-sans pb-28">
 
-   <header class="bg-[#121722] border-b border-slate-800 sticky top-0 z-50">
-    <div class="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
-        <a href="/" class="flex items-center space-x-3 group">
-            <span class="text-2xl group-hover:scale-105 transition">🏆</span>
-            <div>
-                <h1 class="text-base font-extrabold text-amber-400 tracking-wide leading-tight">ESTRELLAS DORADAS</h1>
-                <p class="text-[11px] text-slate-400 font-medium">{{ torneo.nombre if torneo else 'Torneo Oficial' }}</p>
+    <!-- CABECERA SIMPLE SUPERIOR (SOLO LOGO) -->
+    <header class="bg-[#121722]/80 backdrop-blur-md border-b border-slate-800/80 sticky top-0 z-40 px-4 py-3">
+        <div class="max-w-md mx-auto flex items-center justify-between">
+            <div class="flex items-center space-x-2.5">
+                <span class="text-xl">🏆</span>
+                <div>
+                    <h1 class="text-sm font-black text-amber-400 tracking-wider">LIGA+</h1>
+                    <p class="text-[10px] text-slate-400">{{ torneo.nombre if torneo else 'Torneo Oficial' }}</p>
+                </div>
             </div>
-        </a>
-        
-        <nav class="flex items-center gap-1 sm:gap-4 text-xs font-bold">
-            <a href="/" class="text-amber-400 px-2 py-1 border-b-2 border-amber-400">Inicio</a>
-            <a href="/#ligas" class="text-slate-300 hover:text-white px-2 py-1 transition">Ligas</a>
-            <a href="/equipos" class="text-slate-300 hover:text-white px-2 py-1 transition">Equipos</a>
-            <a href="/veedor" class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1.5 rounded-lg border border-slate-700 transition">Veedor</a>
-            <a href="/admin" class="bg-amber-400 hover:bg-amber-500 text-slate-950 px-3 py-1.5 rounded-lg transition font-black">Login</a>
-        </nav>
-    </div>
-</header>
-
-
-    <div class="bg-gradient-to-r from-amber-500/10 via-slate-900 to-amber-500/10 border-b border-slate-800/80 py-2">
-        <div class="max-w-5xl mx-auto px-4 flex items-center justify-between text-xs text-slate-400 overflow-x-auto gap-6 whitespace-nowrap">
-            <span class="font-bold text-amber-400 flex items-center gap-1">⭐ SPONSORS OFICIALES:</span>
-            <span>Gatorade Chile</span>
-            <span>•</span>
-            <span>Balones Penalty Oficial</span>
-            <span>•</span>
-            <span>Complejo Tierra Fértil</span>
-            <span>•</span>
-            <span>Transmisión en Vivo por YouTube</span>
+            <a href="/veedor" class="text-[11px] bg-slate-800 text-amber-400 font-bold px-2.5 py-1 rounded-md border border-slate-700">
+                Planilla Mesa ↗
+            </a>
         </div>
-    </div>
+    </header>
 
-    <main class="max-w-5xl mx-auto px-4 mt-6 space-y-6">
+    <main class="max-w-md mx-auto px-3 mt-4 space-y-5">
 
+        <!-- SELECTOR DE CATEGORÍAS (TABS HORIZONTALES) -->
         <section class="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
             {% for cat in categorias %}
             <a href="/?cat_id={{ cat.id }}" 
-               class="px-4 py-2 rounded-xl text-xs font-bold transition whitespace-nowrap border {% if categoria_activa and categoria_activa.id == cat.id %}bg-amber-400 text-slate-950 border-amber-400 shadow-md{% else %}bg-[#161c28] text-slate-300 border-slate-800 hover:border-slate-600{% endif %}">
+               class="px-3.5 py-1.5 rounded-full text-xs font-bold transition whitespace-nowrap border {% if categoria_activa and categoria_activa.id == cat.id %}bg-amber-400 text-slate-950 border-amber-400 shadow-sm{% else %}bg-[#161c28] text-slate-300 border-slate-800{% endif %}">
                 {{ cat.nombre }}
             </a>
             {% endfor %}
         </section>
 
-        <section class="bg-[#121722] rounded-2xl p-4 sm:p-5 border border-slate-800 shadow-sm">
-            <div class="flex items-center justify-between mb-4">
-                <h2 class="text-sm font-bold text-slate-200 uppercase tracking-wider flex items-center gap-2">
-                    ⚽ Partidos de la Serie ({{ categoria_activa.nombre if categoria_activa else '' }})
-                </h2>
-                <span class="text-[11px] text-slate-400">Toca un partido para ver detalles</span>
+        <!-- FIXTURE DE LA JORNADA -->
+        <section class="space-y-2">
+            <div class="flex items-center justify-between px-1">
+                <h2 class="text-xs font-black uppercase tracking-wider text-slate-300">Partidos • Jornada</h2>
+                <span class="text-[10px] text-slate-500">Toca para incidencias</span>
             </div>
 
-            <div class="grid gap-3 sm:grid-cols-2">
+            <div class="space-y-2.5">
                 {% for p in partidos %}
-                <a href="/partido/{{ p.id }}" class="block bg-[#171e2c] border border-slate-800/80 hover:border-amber-400/50 rounded-xl p-3.5 transition group">
-                    <div class="flex items-center justify-between text-[11px] text-slate-400 mb-2.5">
-                        <span class="font-medium text-slate-400">{{ p.jornada }} • {{ p.fecha_hora }}</span>
-                        <span class="px-2 py-0.5 rounded text-[10px] font-bold {% if p.estado == 'FINALIZADO' %}bg-slate-800 text-slate-300{% elif p.estado == 'EN_VIVO' %}bg-rose-500/20 text-rose-400 border border-rose-500/30 animate-pulse{% else %}bg-blue-500/20 text-blue-400{% endif %}">
+                <a href="/partido/{{ p.id }}" class="block bg-[#121722] border border-slate-800/90 hover:border-amber-400/50 rounded-2xl p-3.5 transition shadow-sm">
+                    <div class="flex items-center justify-between text-[10px] text-slate-400 mb-2">
+                        <span>{{ p.jornada }} • {{ p.cancha }}</span>
+                        <span class="px-2 py-0.5 rounded font-bold {% if p.estado == 'FINALIZADO' %}bg-slate-800 text-slate-300{% elif p.estado == 'EN_VIVO' %}bg-rose-500/20 text-rose-400 animate-pulse{% else %}bg-blue-500/20 text-blue-400{% endif %}">
                             {{ p.estado }}
                         </span>
                     </div>
 
-                    <div class="grid grid-cols-5 items-center gap-2">
+                    <div class="grid grid-cols-5 items-center gap-1">
                         <div class="col-span-2 flex items-center justify-end gap-2 text-right">
-                            <span class="font-bold text-xs sm:text-sm text-slate-200 truncate group-hover:text-amber-400 transition">{{ p.local.nombre }}</span>
+                            <span class="font-bold text-xs text-slate-200 truncate">{{ p.local.nombre }}</span>
                             <img src="{{ p.local.escudo_url }}" class="w-6 h-6 object-contain" alt="">
                         </div>
 
                         <div class="flex items-center justify-center">
-                            <span class="bg-[#0b0e14] px-2.5 py-1 rounded-md font-black text-amber-400 text-sm border border-slate-800 tracking-wider">
+                            <span class="bg-[#0b0e14] px-2.5 py-1 rounded-lg font-black text-amber-400 text-sm border border-slate-800">
                                 {{ p.goles_local }} - {{ p.goles_visita }}
                             </span>
                         </div>
 
                         <div class="col-span-2 flex items-center justify-start gap-2 text-left">
                             <img src="{{ p.visita.escudo_url }}" class="w-6 h-6 object-contain" alt="">
-                            <span class="font-bold text-xs sm:text-sm text-slate-200 truncate group-hover:text-amber-400 transition">{{ p.visita.nombre }}</span>
+                            <span class="font-bold text-xs text-slate-200 truncate">{{ p.visita.nombre }}</span>
                         </div>
                     </div>
                 </a>
@@ -93,43 +75,34 @@
             </div>
         </section>
 
-        <section class="bg-[#121722] rounded-2xl p-4 sm:p-5 border border-slate-800 shadow-sm">
-            <h2 class="text-sm font-bold text-slate-200 uppercase tracking-wider mb-4 flex items-center gap-2">
-                📊 Posiciones • {{ categoria_activa.nombre if categoria_activa else '' }}
+        <!-- TABLA DE POSICIONES COMPACTA -->
+        <section class="bg-[#121722] rounded-2xl p-4 border border-slate-800 shadow-sm">
+            <h2 class="text-xs font-black uppercase tracking-wider text-slate-300 mb-3">
+                📊 Posiciones ({{ categoria_activa.nombre if categoria_activa else '' }})
             </h2>
 
             <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse text-xs sm:text-sm">
+                <table class="w-full text-left border-collapse text-xs">
                     <thead>
-                        <tr class="text-[11px] uppercase text-slate-400 border-b border-slate-800">
-                            <th class="py-2.5 px-2 text-center">#</th>
-                            <th class="py-2.5 px-2">Club</th>
-                            <th class="py-2.5 px-2 text-center font-bold text-amber-400">PTS</th>
-                            <th class="py-2.5 px-2 text-center">PJ</th>
-                            <th class="py-2.5 px-2 text-center">PG</th>
-                            <th class="py-2.5 px-2 text-center">PE</th>
-                            <th class="py-2.5 px-2 text-center">PP</th>
-                            <th class="py-2.5 px-2 text-center">GF</th>
-                            <th class="py-2.5 px-2 text-center">GC</th>
-                            <th class="py-2.5 px-2 text-center font-bold">DG</th>
+                        <tr class="text-[10px] uppercase text-slate-500 border-b border-slate-800">
+                            <th class="py-2 text-center">#</th>
+                            <th class="py-2">Club</th>
+                            <th class="py-2 text-center font-bold text-amber-400">PTS</th>
+                            <th class="py-2 text-center">PJ</th>
+                            <th class="py-2 text-center">DG</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-800/60">
                         {% for fila in tabla %}
-                        <tr class="hover:bg-slate-800/40 transition">
-                            <td class="py-2.5 px-2 text-center font-bold text-slate-400">{{ loop.index }}</td>
-                            <td class="py-2.5 px-2 font-bold text-white flex items-center gap-2">
+                        <tr class="hover:bg-slate-800/30 transition">
+                            <td class="py-2.5 text-center font-bold text-slate-400 text-[11px]">{{ loop.index }}</td>
+                            <td class="py-2.5 font-bold text-white flex items-center gap-2 truncate">
                                 <img src="{{ fila.escudo }}" class="w-4 h-4 object-contain" alt="">
-                                <span>{{ fila.equipo }}</span>
+                                <span class="truncate max-w-[130px]">{{ fila.equipo }}</span>
                             </td>
-                            <td class="py-2.5 px-2 text-center font-black text-amber-400 bg-amber-400/5 rounded">{{ fila.pts }}</td>
-                            <td class="py-2.5 px-2 text-center text-slate-300">{{ fila.pj }}</td>
-                            <td class="py-2.5 px-2 text-center text-slate-300">{{ fila.pg }}</td>
-                            <td class="py-2.5 px-2 text-center text-slate-300">{{ fila.pe }}</td>
-                            <td class="py-2.5 px-2 text-center text-slate-300">{{ fila.pp }}</td>
-                            <td class="py-2.5 px-2 text-center text-slate-300">{{ fila.gf }}</td>
-                            <td class="py-2.5 px-2 text-center text-slate-300">{{ fila.gc }}</td>
-                            <td class="py-2.5 px-2 text-center font-bold {% if fila.dg > 0 %}text-emerald-400{% elif fila.dg < 0 %}text-rose-400{% else %}text-slate-400{% endif %}">
+                            <td class="py-2.5 text-center font-black text-amber-400 bg-amber-400/5 rounded">{{ fila.pts }}</td>
+                            <td class="py-2.5 text-center text-slate-300">{{ fila.pj }}</td>
+                            <td class="py-2.5 text-center font-bold {% if fila.dg > 0 %}text-emerald-400{% elif fila.dg < 0 %}text-rose-400{% else %}text-slate-400{% endif %}">
                                 {{ "%+d"|format(fila.dg) }}
                             </td>
                         </tr>
@@ -141,5 +114,26 @@
 
     </main>
 
+    <!-- BOTTOM NAV BAR -->
+    <nav class="fixed bottom-0 left-0 right-0 bg-[#0d121d]/95 backdrop-blur-lg border-t border-slate-800 px-6 py-2.5 z-50">
+        <div class="max-w-md mx-auto flex items-center justify-between text-center">
+            <a href="/" class="flex flex-col items-center flex-1 text-amber-400">
+                <svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                <span class="text-[10px] font-bold">Inicio</span>
+            </a>
+            <a href="/estadisticas" class="flex flex-col items-center flex-1 text-slate-400 hover:text-slate-200">
+                <svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+                <span class="text-[10px] font-bold">Ligas</span>
+            </a>
+            <a href="/equipos" class="flex flex-col items-center flex-1 text-slate-400 hover:text-slate-200">
+                <svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                <span class="text-[10px] font-bold">Equipos</span>
+            </a>
+            <a href="/admin" class="flex flex-col items-center flex-1 text-slate-400 hover:text-slate-200">
+                <svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                <span class="text-[10px] font-bold">Login</span>
+            </a>
+        </div>
+    </nav>
 </body>
 </html>
