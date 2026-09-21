@@ -113,12 +113,10 @@ def calcular_tabla_categoria(db: Session, categoria_id: int):
     lista.sort(key=lambda x: (x["pts"], x["dg"], x["gf"]), reverse=True)
     return lista
 
-
 # ==========================================
-# RUTAS DE NAVEGACIÓN PRINCIPAL
+# RUTAS PRINCIPALES
 # ==========================================
 
-# 1. INICIO (Ligas / Portada con Fixture y Tabla)
 @app.get("/", response_class=HTMLResponse)
 def home_publica(request: Request, cat_id: Optional[int] = None, db: Session = Depends(get_db)):
     torneo = db.query(models.Torneo).filter(models.Torneo.activo == True).first()
@@ -143,72 +141,97 @@ def home_publica(request: Request, cat_id: Optional[int] = None, db: Session = D
             "categorias": categorias,
             "categoria_activa": categoria_activa,
             "partidos": partidos,
-            "tabla": tabla
+            "tabla": tabla,
+            "pagina_activa": "inicio"
         }
     )
 
-# 2. EQUIPOS (Directorio y galería de clubes)
+# VISTA: ESTADÍSTICAS Y RANKINGS (Goleadores, Fair Play)
+@app.get("/estadisticas", response_class=HTMLResponse)
+def vista_estadisticas(request: Request, db: Session = Depends(get_db)):
+    # Ranking de Goleadores
+    jugadores = db.query(models.Jugador).all()
+    ranking_goleadores = []
+    for j in jugadores:
+        total_goles = db.query(models.Incidencia).filter(
+            models.Incidencia.jugador_id == j.id, models.Incidencia.tipo == "GOL"
+        ).count()
+        if total_goles > 0:
+            ranking_goleadores.append({
+                "jugador": j,
+                "equipo": j.equipo.nombre,
+                "escudo": j.equipo.escudo_url,
+                "goles": total_goles
+            })
+    ranking_goleadores.sort(key=lambda x: x["goles"], reverse=True)
+
+    # Ranking MVP
+    ranking_mvp = []
+    for j in jugadores:
+        total_mvp = db.query(models.Incidencia).filter(
+            models.Incidencia.jugador_id == j.id, models.Incidencia.tipo == "MVP"
+        ).count()
+        if total_mvp > 0:
+            ranking_mvp.append({
+                "jugador": j,
+                "equipo": j.equipo.nombre,
+                "mvps": total_mvp
+            })
+    ranking_mvp.sort(key=lambda x: x["mvps"], reverse=True)
+
+    return templates.TemplateResponse(
+        request=request, name="estadisticas.html",
+        context={
+            "goleadores": ranking_goleadores,
+            "mvps": ranking_mvp,
+            "pagina_activa": "ligas"
+        }
+    )
+
 @app.get("/equipos", response_class=HTMLResponse)
 def vista_equipos(request: Request, db: Session = Depends(get_db)):
     categorias = db.query(models.Categoria).all()
     return templates.TemplateResponse(
         request=request, name="equipos.html",
-        context={"categorias": categorias}
+        context={"categorias": categorias, "pagina_activa": "equipos"}
     )
 
-# 3. FICHA INDIVIDUAL DE EQUIPO
 @app.get("/equipo/{equipo_id}", response_class=HTMLResponse)
 def ficha_equipo(request: Request, equipo_id: int, db: Session = Depends(get_db)):
     equipo = db.query(models.Equipo).filter(models.Equipo.id == equipo_id).first()
     if not equipo:
         raise HTTPException(status_code=404, detail="Equipo no encontrado")
 
-    # Partidos jugados por este equipo
     partidos = db.query(models.Partido).filter(
         (models.Partido.local_id == equipo_id) | (models.Partido.visita_id == equipo_id)
     ).all()
 
     return templates.TemplateResponse(
         request=request, name="equipo_detalle.html",
-        context={"equipo": equipo, "partidos": partidos}
+        context={"equipo": equipo, "partidos": partidos, "pagina_activa": "equipos"}
     )
 
-# 4. FICHA INDIVIDUAL DE JUGADOR
 @app.get("/jugador/{jugador_id}", response_class=HTMLResponse)
 def ficha_jugador(request: Request, jugador_id: int, db: Session = Depends(get_db)):
     jugador = db.query(models.Jugador).filter(models.Jugador.id == jugador_id).first()
     if not jugador:
         raise HTTPException(status_code=404, detail="Jugador no encontrado")
 
-    # Estadísticas acumuladas
-    goles = db.query(models.Incidencia).filter(
-        models.Incidencia.jugador_id == jugador_id, models.Incidencia.tipo == "GOL"
-    ).count()
-    amarillas = db.query(models.Incidencia).filter(
-        models.Incidencia.jugador_id == jugador_id, models.Incidencia.tipo == "AMARILLA"
-    ).count()
-    rojas = db.query(models.Incidencia).filter(
-        models.Incidencia.jugador_id == jugador_id, models.Incidencia.tipo == "ROJA"
-    ).count()
-    mvps = db.query(models.Incidencia).filter(
-        models.Incidencia.jugador_id == jugador_id, models.Incidencia.tipo == "MVP"
-    ).count()
-
+    goles = db.query(models.Incidencia).filter(models.Incidencia.jugador_id == jugador_id, models.Incidencia.tipo == "GOL").count()
+    amarillas = db.query(models.Incidencia).filter(models.Incidencia.jugador_id == jugador_id, models.Incidencia.tipo == "AMARILLA").count()
+    rojas = db.query(models.Incidencia).filter(models.Incidencia.jugador_id == jugador_id, models.Incidencia.tipo == "ROJA").count()
+    mvps = db.query(models.Incidencia).filter(models.Incidencia.jugador_id == jugador_id, models.Incidencia.tipo == "MVP").count()
     incidencias = db.query(models.Incidencia).filter(models.Incidencia.jugador_id == jugador_id).all()
 
     return templates.TemplateResponse(
         request=request, name="jugador_detalle.html",
         context={
-            "jugador": jugador,
-            "goles": goles,
-            "amarillas": amarillas,
-            "rojas": rojas,
-            "mvps": mvps,
-            "incidencias": incidencias
+            "jugador": jugador, "goles": goles, "amarillas": amarillas,
+            "rojas": rojas, "mvps": mvps, "incidencias": incidencias,
+            "pagina_activa": "equipos"
         }
     )
 
-# 5. CENTRO DE PARTIDO INDIVIDUAL
 @app.get("/partido/{partido_id}", response_class=HTMLResponse)
 def centro_partido(request: Request, partido_id: int, db: Session = Depends(get_db)):
     partido = db.query(models.Partido).filter(models.Partido.id == partido_id).first()
@@ -217,7 +240,7 @@ def centro_partido(request: Request, partido_id: int, db: Session = Depends(get_
     incidencias = db.query(models.Incidencia).filter(models.Incidencia.partido_id == partido_id).all()
     return templates.TemplateResponse(
         request=request, name="partido_detalle.html",
-        context={"partido": partido, "incidencias": incidencias}
+        context={"partido": partido, "incidencias": incidencias, "pagina_activa": "inicio"}
     )
 
 @app.post("/partido/{partido_id}/incidencia")
@@ -229,7 +252,6 @@ def registrar_incidencia(
     if not partido:
         raise HTTPException(status_code=404, detail="Partido no encontrado")
 
-    # Vincular con un jugador registrado si coincide el nombre
     equipo_actual = partido.local if equipo_tipo == "local" else partido.visita
     jugador = db.query(models.Jugador).filter(
         models.Jugador.equipo_id == equipo_actual.id,
@@ -261,16 +283,14 @@ def eliminar_incidencia(partido_id: int, incidencia_id: int, db: Session = Depen
         db.commit()
     return RedirectResponse(url=f"/partido/{partido_id}", status_code=303)
 
-# 6. VEEDOR / MESA DE ENTRADA
 @app.get("/veedor", response_class=HTMLResponse)
 def vista_veedor(request: Request, db: Session = Depends(get_db)):
     partidos = db.query(models.Partido).all()
-    return templates.TemplateResponse(request=request, name="veedor.html", context={"partidos": partidos})
+    return templates.TemplateResponse(request=request, name="veedor.html", context={"partidos": partidos, "pagina_activa": "login"})
 
-# 7. PANEL DE ADMINISTRACIÓN / LOGIN
 @app.get("/admin", response_class=HTMLResponse)
 def vista_admin(request: Request, db: Session = Depends(get_db)):
     return templates.TemplateResponse(
         request=request, name="admin.html",
-        context={"equipos": db.query(models.Equipo).all(), "partidos": db.query(models.Partido).all()}
+        context={"equipos": db.query(models.Equipo).all(), "partidos": db.query(models.Partido).all(), "pagina_activa": "login"}
     )
