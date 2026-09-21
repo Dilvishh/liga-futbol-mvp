@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Equipos - Liga de Estrellas Doradas</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-[#0b0e14] text-slate-100 min-h-screen font-sans pb-16">
+
+    <header class="bg-[#121722] border-b border-slate-800 sticky top-0 z-50">
+        <div class="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
+            <a href="/" class="flex items-center space-x-3">
+                <span class="text-2xl">🏆</span>
+                <span class="text-base font-extrabold text-amber-400 tracking-wide">ESTRELLAS DORADAS</span>
+            </a>
+            <nav class="flex items-center gap-1 sm:gap-4 text-xs font-bold">
+                <a href="/" class="text-slate-300 hover:text-white px-2 py-1">Inicio</a>
+                <a href="/#ligas" class="text-slate-300 hover:text-white px-2 py-1">Ligas</a>
+                <a href="/equipos" class="text-amber-400 px-2 py-1 border-b-2 border-amber-400">Equipos</a>
+                <a href="/veedor" class="bg-slate-800 text-slate-200 px-3 py-1.5 rounded-lg border border-slate-700">Veedor</a>
+                <a href="/admin" class="bg-amber-400 text-slate-950 px-3 py-1.5 rounded-lg font-black">Login</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="max-w-5xl mx-auto px-4 mt-6 space-y-8">
+        <div>
+            <h2 class="text-xl font-black text-white">🛡️ Clubes Participantes</h2>
+            <p class="text-xs text-slate-400">Selecciona un equipo para consultar su plantilla y estadísticas</p>
+        </div>
+
+        {% for cat in categorias %}
+        <section class="space-y-3">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-amber-400 bg-amber-400/10 px-3 py-1.5 rounded-lg border border-amber-400/20 w-fit">
+                {{ cat.nombre }}
+            </h3>
+
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                {% for eq in cat.equipos %}
+                <a href="/equipo/{{ eq.id }}" class="bg-[#121722] border border-slate-800 hover:border-amber-400/50 p-4 rounded-xl flex flex-col items-center text-center transition group shadow-sm">
+                    <img src="{{ eq.escudo_url }}" class="w-14 h-14 object-contain mb-3 group-hover:scale-105 transition" alt="">
+                    <span class="font-bold text-sm text-slate-200 group-hover:text-amber-400 transition truncate w-full">{{ eq.nombre }}</span>
+                    <span class="text-[11px] text-slate-400 mt-1">{{ eq.jugadores|length }} jugadores</span>
+                </a>
+                {% endfor %}
+            </div>
+        </section>
+        {% endfor %}
+    </main>
+</body>
+</html>
